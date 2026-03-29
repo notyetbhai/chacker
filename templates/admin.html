@@ -1,0 +1,256 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FlareCloud — Admin Panel</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+    <style>
+        .admin-container { max-width: 800px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
+        .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
+        .admin-header h1 { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #FF8C00, #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .admin-nav { display: flex; gap: 10px; }
+        .admin-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.8rem; padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px; transition: all 0.2s; }
+        .admin-nav a:hover { border-color: var(--accent); color: var(--accent); }
+
+        .key-section { margin-bottom: 32px; }
+        .key-section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
+        .key-section-title svg { color: var(--accent); }
+
+        .create-form { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end; }
+        .create-form .field { display: flex; flex-direction: column; gap: 4px; }
+        .create-form .field label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 500; }
+        .create-form input, .create-form select { padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; outline: none; transition: border-color 0.2s; }
+        .create-form input:focus, .create-form select:focus { border-color: rgba(255,140,0,0.5); }
+        .create-form select { font-family: 'Inter', sans-serif; }
+        .create-form select option { background: #12121A; }
+
+        .btn-create { padding: 10px 20px; background: linear-gradient(135deg, #FF8C00, #CC7000); color: #000; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(255,140,0,0.3); }
+        .btn-create:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255,140,0,0.4); }
+
+        .keys-list { display: flex; flex-direction: column; gap: 8px; }
+        .key-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; transition: all 0.2s; }
+        .key-card:hover { border-color: rgba(255,140,0,0.2); background: rgba(24,24,38,0.85); }
+        .key-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
+        .key-value { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent); font-weight: 600; letter-spacing: 0.5px; }
+        .key-meta { display: flex; gap: 12px; font-size: 0.7rem; color: var(--text-muted); }
+        .key-meta .label-tag { background: rgba(255,140,0,0.1); color: var(--accent); padding: 1px 8px; border-radius: 4px; font-weight: 500; }
+        .key-meta .expires-tag { color: var(--green); }
+        .key-meta .expires-tag.expired { color: var(--red); }
+        .key-meta .type-tag { background: rgba(0,230,118,0.1); color: var(--green); padding: 1px 8px; border-radius: 4px; }
+        .key-meta .type-tag.temp { background: rgba(255,171,64,0.1); color: #FFAB40; }
+
+        .btn-delete { background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.2); color: var(--red); padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
+        .btn-delete:hover { background: rgba(255,82,82,0.15); border-color: rgba(255,82,82,0.4); }
+        .btn-copy { background: rgba(68,138,255,0.08); border: 1px solid rgba(68,138,255,0.2); color: #448AFF; padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 8px; }
+        .btn-copy:hover { background: rgba(68,138,255,0.15); }
+
+        .empty-state { text-align: center; padding: 32px; color: var(--text-muted); font-size: 0.85rem; }
+
+        .created-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(18,18,28,0.95); backdrop-filter: blur(24px); border: 1px solid rgba(255,140,0,0.3); border-radius: 16px; padding: 32px; text-align: center; z-index: 9999; min-width: 380px; box-shadow: 0 24px 80px rgba(0,0,0,0.6); animation: cardIn 0.3s ease; display: none; }
+        .created-popup.visible { display: block; }
+        .created-popup h3 { color: var(--green); margin-bottom: 16px; font-size: 1rem; }
+        .created-popup .new-key { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: var(--accent); background: rgba(255,140,0,0.08); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(255,140,0,0.2); margin-bottom: 16px; letter-spacing: 1px; user-select: all; }
+        .created-popup .popup-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px; }
+        .created-popup .btn-close-popup { padding: 10px 24px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.8rem; transition: all 0.2s; }
+        .created-popup .btn-close-popup:hover { border-color: var(--accent); color: var(--accent); }
+        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9998; display: none; }
+        .overlay.visible { display: block; }
+
+        @keyframes cardIn { from { opacity: 0; transform: translate(-50%,-50%) scale(0.9); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+    </style>
+</head>
+<body>
+    <div class="bg-grid"></div>
+    <div class="bg-glow bg-glow-1"></div>
+    <div class="bg-glow bg-glow-2"></div>
+
+    <div class="admin-container">
+        <div class="admin-header">
+            <h1>🔑 Key Management</h1>
+            <div class="admin-nav">
+                <a href="/">← Dashboard</a>
+                <form action="/logout" method="POST" style="display:inline;"><button type="submit" class="btn-logout" style="font-size:0.8rem;">Logout</button></form>
+            </div>
+        </div>
+
+        <!-- Create Temp Key -->
+        <div class="key-section">
+            <div class="key-section-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+                Create Temporary Key
+            </div>
+            <div class="create-form">
+                <div class="field">
+                    <label>Label</label>
+                    <input type="text" id="key-label" placeholder="e.g. User123" value="Temporary Key">
+                </div>
+                <div class="field">
+                    <label>Duration</label>
+                    <select id="key-duration">
+                        <option value="1">1 Hour</option>
+                        <option value="6">6 Hours</option>
+                        <option value="12">12 Hours</option>
+                        <option value="24" selected>24 Hours</option>
+                        <option value="72">3 Days</option>
+                        <option value="168">7 Days</option>
+                        <option value="720">30 Days</option>
+                    </select>
+                </div>
+                <button class="btn-create" id="btn-create-key">+ Generate Key</button>
+            </div>
+        </div>
+
+        <!-- Permanent Keys -->
+        <div class="key-section">
+            <div class="key-section-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Permanent Keys
+            </div>
+            <div class="keys-list" id="permanent-keys"></div>
+        </div>
+
+        <!-- Temporary Keys -->
+        <div class="key-section">
+            <div class="key-section-title">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                Temporary Keys
+            </div>
+            <div class="keys-list" id="temp-keys"></div>
+        </div>
+    </div>
+
+    <!-- Created Popup -->
+    <div class="overlay" id="overlay"></div>
+    <div class="created-popup" id="created-popup">
+        <h3>✓ Key Created Successfully</h3>
+        <div class="new-key" id="new-key-display"></div>
+        <div class="popup-meta" id="popup-meta"></div>
+        <button class="btn-copy" id="btn-copy-new" style="margin-bottom:12px;">Copy Key</button>
+        <br>
+        <button class="btn-close-popup" id="btn-close-popup">Close</button>
+    </div>
+
+    <script>
+        async function loadKeys() {
+            const res = await fetch('/api/admin/keys');
+            const data = await res.json();
+            renderPermanent(data.permanent || []);
+            renderTemp(data.temporary || []);
+        }
+
+        function renderPermanent(keys) {
+            const container = document.getElementById('permanent-keys');
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="empty-state">No permanent keys</div>';
+                return;
+            }
+            container.innerHTML = keys.map(k => `
+                <div class="key-card">
+                    <div class="key-info">
+                        <div class="key-value">${k}</div>
+                        <div class="key-meta"><span class="type-tag">PERMANENT</span></div>
+                    </div>
+                    <div>
+                        <button class="btn-copy" onclick="copyKey('${k}')">Copy</button>
+                        <button class="btn-delete" onclick="deleteKey('${k}')">Delete</button>
+                    </div>
+                </div>
+            `).join('');
+        }
+
+        function renderTemp(keys) {
+            const container = document.getElementById('temp-keys');
+            if (keys.length === 0) {
+                container.innerHTML = '<div class="empty-state">No temporary keys — create one above</div>';
+                return;
+            }
+            const now = new Date();
+            container.innerHTML = keys.map(tk => {
+                const exp = new Date(tk.expires);
+                const remaining = exp - now;
+                let timeStr;
+                if (remaining <= 0) { timeStr = 'EXPIRED'; }
+                else if (remaining < 3600000) { timeStr = Math.ceil(remaining/60000) + 'm remaining'; }
+                else if (remaining < 86400000) { timeStr = Math.ceil(remaining/3600000) + 'h remaining'; }
+                else { timeStr = Math.ceil(remaining/86400000) + 'd remaining'; }
+                const isExpired = remaining <= 0;
+                return `
+                <div class="key-card">
+                    <div class="key-info">
+                        <div class="key-value">${tk.key}</div>
+                        <div class="key-meta">
+                            <span class="type-tag temp">TEMP</span>
+                            <span class="label-tag">${tk.label || ''}</span>
+                            <span class="expires-tag ${isExpired ? 'expired' : ''}">${timeStr}</span>
+                        </div>
+                    </div>
+                    <div>
+                        <button class="btn-copy" onclick="copyKey('${tk.key}')">Copy</button>
+                        <button class="btn-delete" onclick="deleteKey('${tk.key}')">Delete</button>
+                    </div>
+                </div>`;
+            }).join('');
+        }
+
+        function copyKey(key) {
+            navigator.clipboard.writeText(key).then(() => {
+                const btns = document.querySelectorAll('.btn-copy');
+                btns.forEach(b => { if (b.textContent === 'Copied!') b.textContent = 'Copy'; });
+                event.target.textContent = 'Copied!';
+                setTimeout(() => { event.target.textContent = 'Copy'; }, 2000);
+            });
+        }
+
+        async function deleteKey(key) {
+            if (!confirm('Delete this key?')) return;
+            await fetch('/api/admin/keys/delete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ key })
+            });
+            loadKeys();
+        }
+
+        document.getElementById('btn-create-key').addEventListener('click', async () => {
+            const label = document.getElementById('key-label').value || 'Temporary Key';
+            const hours = parseInt(document.getElementById('key-duration').value);
+            const res = await fetch('/api/admin/keys/create', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ label, hours })
+            });
+            const data = await res.json();
+            if (data.success) {
+                document.getElementById('new-key-display').textContent = data.key;
+                const exp = new Date(data.expires);
+                document.getElementById('popup-meta').textContent = `Expires: ${exp.toLocaleString()} • Label: ${data.label}`;
+                document.getElementById('created-popup').classList.add('visible');
+                document.getElementById('overlay').classList.add('visible');
+                loadKeys();
+            }
+        });
+
+        document.getElementById('btn-copy-new').addEventListener('click', () => {
+            const key = document.getElementById('new-key-display').textContent;
+            navigator.clipboard.writeText(key);
+            document.getElementById('btn-copy-new').textContent = 'Copied!';
+            setTimeout(() => { document.getElementById('btn-copy-new').textContent = 'Copy Key'; }, 2000);
+        });
+
+        document.getElementById('btn-close-popup').addEventListener('click', () => {
+            document.getElementById('created-popup').classList.remove('visible');
+            document.getElementById('overlay').classList.remove('visible');
+        });
+        document.getElementById('overlay').addEventListener('click', () => {
+            document.getElementById('created-popup').classList.remove('visible');
+            document.getElementById('overlay').classList.remove('visible');
+        });
+
+        loadKeys();
+    </script>
+</body>
+</html>
