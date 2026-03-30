@@ -1,8 +1,15 @@
-import requests, re, readchar, os, time, threading, random, urllib3, configparser, json, concurrent.futures, traceback, warnings, uuid, socket, socks, sys
+import requests, re, os, time, threading, random, urllib3, configparser, json, concurrent.futures, traceback, warnings, uuid, socket, socks, sys
 from datetime import datetime, timezone
 from colorama import Fore
 from console import utils
-from tkinter import filedialog
+try:
+    import readchar
+except ImportError:
+    readchar = None
+try:
+    from tkinter import filedialog
+except ImportError:
+    filedialog = None
 from urllib.parse import urlparse, parse_qs
 from io import StringIO
 
