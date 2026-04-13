@@ -101,11 +101,11 @@ class Capture:
             # Construct message payload
             if config.get('embed') == True:
                 payload = {
-                    "username": "FlareCloud",
+                    "username": "yetcloud",
                     "avatar_url": "https://cdn.discordapp.com/attachments/1395684019991216139/1415287001552392213/Lucid_Realism_Overall_Theme_The_image_is_a_logo_design_for_a_c_3.jpg?ex=68c2a83b&is=68c156bb&hm=cd1d93e3cf57de88d8bb4ca7361a3020bae96e2dbce4ffe94f51f398d7c4f3df&",
                     "embeds": [{
                             "author": {
-                                "name": "FlareCloud",
+                                "name": "yetcloud",
                                 "url": "https://discord.gg/EG9pYUUnZj",
                                 "icon_url": "https://cdn.discordapp.com/attachments/1395684019991216139/1415287001552392213/Lucid_Realism_Overall_Theme_The_image_is_a_logo_design_for_a_c_3.jpg?ex=68c2a83b&is=68c156bb&hm=cd1d93e3cf57de88d8bb4ca7361a3020bae96e2dbce4ffe94f51f398d7c4f3df&"
                             },
@@ -124,7 +124,7 @@ class Capture:
                             ],
                             "thumbnail": {"url": f"https://cdn.discordapp.com/attachments/1395684019991216139/1415287001552392213/Lucid_Realism_Overall_Theme_The_image_is_a_logo_design_for_a_c_3.jpg?ex=68c2a83b&is=68c156bb&hm=cd1d93e3cf57de88d8bb4ca7361a3020bae96e2dbce4ffe94f51f398d7c4f3df&"},
                             "footer": {
-                                "text": "FlareCloud ・Made with ❤️",
+                                "text": "yetcloud ・Made with ❤️",
                                 "icon_url": "https://cdn.discordapp.com/attachments/1395684019991216139/1415287001552392213/Lucid_Realism_Overall_Theme_The_image_is_a_logo_design_for_a_c_3.jpg?ex=68c2a83b&is=68c156bb&hm=cd1d93e3cf57de88d8bb4ca7361a3020bae96e2dbce4ffe94f51f398d7c4f3df&"
                             }
                         }
@@ -150,7 +150,7 @@ class Capture:
                         .replace("<namechange>", self.namechanged or "N/A")
                         .replace("<lastchanged>", self.lastchanged or "N/A")
                         .replace("<type>", self.type or "N/A"),
-                    "username": "FlareCloud ・Made with ❤️"
+                    "username": "yetcloud ・Made with ❤️"
                 }
 
             # Send webhook request
@@ -755,7 +755,7 @@ def finishedscreen():
         "avatar_url": "https://cdn.discordapp.com/attachments/1395684019991216139/1415287001552392213/Lucid_Realism_Overall_Theme_The_image_is_a_logo_design_for_a_c_3.jpg?ex=68c2a83b&is=68c156bb&hm=cd1d93e3cf57de88d8bb4ca7361a3020bae96e2dbce4ffe94f51f398d7c4f3df&",
         "embeds": [
             {
-                "title": "🎉FlareCloud Checking Summary 🎉",
+                "title": "🎉yetcloud Checking Summary 🎉",
                 "color": 0x00FF00,  # Green color
                 "fields": [
                     {"name": "📊 Total Checked", "value": str(len(Combos)), "inline": True},
@@ -1012,7 +1012,7 @@ def banproxyload():
 
 def Main():
     global proxytype, screen
-    utils.set_title("FlareCloud")
+    utils.set_title("yetcloud")
     os.system('cls')
     try:
         loadconfig()
@@ -1028,7 +1028,7 @@ def Main():
         print(Fore.LIGHTRED_EX+"Must be a number.") 
         time.sleep(2)
         Main()
-    print(Fore.LIGHTBLUE_EX+"Proxy Type: [1] Http\s - [2] Socks4 - [3] Socks5 - [4] None - [5] Auto Scraper")
+    print(Fore.LIGHTBLUE_EX+r"Proxy Type: [1] Http\s - [2] Socks4 - [3] Socks5 - [4] None - [5] Auto Scraper")
     proxytype = repr(readchar.readkey())
     cleaned = int(proxytype.replace("'", ""))
     if cleaned not in range(1, 6):

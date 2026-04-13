@@ -3,275 +3,218 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlareCloud — Login</title>
+    <title>YetCloud — Cyberpunk Login</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --accent: #FF8C00;
-            --accent-light: #FFB347;
-            --accent-dark: #CC7000;
-            --accent-glow: rgba(255, 140, 0, 0.4);
-            --gold: #FFD700;
-            --bg-primary: #0A0A0F;
-            --bg-card: rgba(18, 18, 28, 0.7);
-            --bg-input: rgba(10, 10, 18, 0.6);
-            --border: rgba(255, 255, 255, 0.06);
-            --border-focus: rgba(255, 140, 0, 0.6);
-            --text-primary: #F0F0F5;
-            --text-secondary: #8888A0;
-            --text-muted: #55556A;
-            --red: #FF5252;
+            --bg-dark: #05070a;
+            --bg-card: rgba(13, 20, 30, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --neon-blue: #00d2ff;
+            --neon-cyan: #00f2fe;
+            --neon-purple: #9d50bb;
+            --neon-red: #ff0055;
+            --text-main: #e0e6ed;
+            --text-dim: #8892b0;
+            --radius: 12px;
             --ease: cubic-bezier(0.4, 0, 0.2, 1);
         }
 
         * { margin: 0; padding: 0; box-sizing: border-box; }
 
         body {
-            font-family: 'Inter', -apple-system, sans-serif;
-            background: var(--bg-primary);
-            color: var(--text-primary);
+            font-family: 'Inter', sans-serif;
+            background: var(--bg-dark);
+            color: var(--text-main);
             min-height: 100vh;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: hidden;
+            background-image: 
+                radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.08) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(157, 80, 187, 0.08) 0%, transparent 40%);
         }
 
-        /* Animated Background */
-        .bg-grid {
-            position: fixed; inset: 0;
-            background-image:
-                linear-gradient(rgba(255, 140, 0, 0.03) 1px, transparent 1px),
-                linear-gradient(90deg, rgba(255, 140, 0, 0.03) 1px, transparent 1px);
-            background-size: 60px 60px;
-            z-index: 0; pointer-events: none;
-        }
-
-        .bg-glow {
-            position: fixed; border-radius: 50%; filter: blur(120px);
-            z-index: 0; pointer-events: none; animation: float 20s infinite ease-in-out;
-        }
-        .bg-glow-1 { width: 600px; height: 600px; background: rgba(255, 140, 0, 0.1); top: -200px; right: -200px; }
-        .bg-glow-2 { width: 500px; height: 500px; background: rgba(255, 215, 0, 0.06); bottom: -150px; left: -150px; animation-delay: -7s; }
-
-        @keyframes float {
-            0%, 100% { transform: translate(0, 0) scale(1); }
-            25% { transform: translate(30px, -30px) scale(1.05); }
-            50% { transform: translate(-20px, 20px) scale(0.95); }
-            75% { transform: translate(10px, 10px) scale(1.02); }
-        }
-
-        /* Login Card */
         .login-container {
             position: relative; z-index: 1;
-            width: 100%; max-width: 420px; padding: 0 20px;
+            width: 100%; max-width: 440px; padding: 0 20px;
         }
 
         .login-card {
             background: var(--bg-card);
-            backdrop-filter: blur(24px);
-            -webkit-backdrop-filter: blur(24px);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
             border: 1px solid var(--border);
-            border-radius: 20px;
-            padding: 48px 40px;
+            border-radius: 16px;
+            padding: 50px 40px;
             text-align: center;
-            animation: cardIn 0.6s var(--ease);
-            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 30px 60px rgba(0, 0, 0, 0.6), 0 0 40px rgba(0, 210, 255, 0.05);
+            position: relative;
+            overflow: hidden;
         }
 
-        @keyframes cardIn {
-            from { opacity: 0; transform: translateY(30px) scale(0.95); }
-            to { opacity: 1; transform: translateY(0) scale(1); }
+        .login-card::before {
+            content: ''; position: absolute; top: 0; left: 0; right: 0; height: 3px;
+            background: linear-gradient(90deg, var(--neon-blue), var(--neon-purple));
         }
 
-        /* Logo */
         .login-logo {
-            width: 64px; height: 64px; margin: 0 auto 20px;
-            animation: pulse-glow 3s infinite ease-in-out;
-        }
-
-        @keyframes pulse-glow {
-            0%, 100% { filter: drop-shadow(0 0 12px var(--accent-glow)); }
-            50% { filter: drop-shadow(0 0 24px var(--accent-glow)); }
+            width: 70px; height: 70px; margin: 0 auto 25px;
+            filter: drop-shadow(0 0 15px rgba(0, 210, 255, 0.3));
         }
 
         .login-title {
-            font-size: 1.8rem; font-weight: 800;
-            background: linear-gradient(135deg, var(--accent), var(--gold));
+            font-size: 2rem; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 2px;
+            background: linear-gradient(to right, var(--neon-blue), #fff);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; margin-bottom: 6px; letter-spacing: -0.5px;
+            background-clip: text; margin-bottom: 8px;
         }
 
         .login-subtitle {
-            font-size: 0.8rem; color: var(--text-muted);
-            text-transform: uppercase; letter-spacing: 2px;
-            margin-bottom: 36px;
+            font-size: 0.75rem; color: var(--neon-red);
+            text-transform: uppercase; letter-spacing: 3px;
+            font-weight: 700; margin-bottom: 40px;
         }
 
-        /* Key Input */
-        .key-input-group {
-            position: relative; margin-bottom: 24px; text-align: left;
+        .input-group {
+            text-align: left; margin-bottom: 25px;
         }
 
-        .key-label {
-            display: block; font-size: 0.72rem; font-weight: 600;
-            color: var(--text-secondary); text-transform: uppercase;
-            letter-spacing: 1px; margin-bottom: 8px;
+        .input-label {
+            display: block; font-size: 0.7rem; font-weight: 700;
+            color: var(--text-dim); text-transform: uppercase;
+            letter-spacing: 1.5px; margin-bottom: 10px;
         }
 
-        .key-input-wrapper {
+        .input-wrapper {
             position: relative;
         }
 
-        .key-input-wrapper svg {
+        .input-wrapper svg {
             position: absolute; left: 14px; top: 50%; transform: translateY(-50%);
-            width: 18px; height: 18px; color: var(--text-muted);
+            width: 18px; height: 18px; color: var(--text-dim);
             transition: color 0.3s;
         }
 
-        .key-input {
-            width: 100%; padding: 14px 14px 14px 42px;
-            background: var(--bg-input);
+        .login-input {
+            width: 100%; padding: 14px 14px 14px 44px;
+            background: rgba(0, 0, 0, 0.3);
             border: 1px solid var(--border);
             border-radius: 10px;
-            color: var(--text-primary);
+            color: var(--neon-cyan);
             font-family: 'JetBrains Mono', monospace;
             font-size: 0.9rem;
-            letter-spacing: 1px;
-            transition: all 0.25s var(--ease);
             outline: none;
+            transition: all 0.3s;
         }
 
-        .key-input:focus {
-            border-color: var(--border-focus);
-            box-shadow: 0 0 0 3px rgba(255, 140, 0, 0.1);
+        .login-input:focus {
+            border-color: var(--neon-blue);
+            box-shadow: 0 0 15px rgba(0, 210, 255, 0.1);
         }
 
-        .key-input:focus + svg,
-        .key-input:focus ~ svg {
-            color: var(--accent);
+        .login-input:focus + svg {
+            color: var(--neon-blue);
         }
 
-        .key-input::placeholder {
-            color: var(--text-muted);
-            font-family: 'Inter', sans-serif;
-            letter-spacing: 0;
+        .error-msg {
+            display: none; padding: 12px; margin-bottom: 20px;
+            background: rgba(255, 0, 85, 0.1);
+            border: 1px solid rgba(255, 0, 85, 0.3);
+            border-radius: 8px; color: var(--neon-red);
+            font-size: 0.8rem; font-weight: 600; text-align: left;
         }
 
-        /* Error Message */
-        .login-error {
-            display: none;
-            padding: 10px 14px;
-            background: rgba(255, 82, 82, 0.1);
-            border: 1px solid rgba(255, 82, 82, 0.2);
-            border-radius: 8px;
-            color: var(--red);
-            font-size: 0.8rem;
-            margin-bottom: 20px;
-            animation: shake 0.4s var(--ease);
-            text-align: left;
-        }
-
-        .login-error.visible { display: block; }
+        .error-msg.visible { display: block; animation: shake 0.4s; }
 
         @keyframes shake {
             0%, 100% { transform: translateX(0); }
-            20% { transform: translateX(-8px); }
-            40% { transform: translateX(8px); }
-            60% { transform: translateX(-4px); }
-            80% { transform: translateX(4px); }
+            20% { transform: translateX(-5px); }
+            40% { transform: translateX(5px); }
+            60% { transform: translateX(-3px); }
+            80% { transform: translateX(3px); }
         }
 
-        /* Submit Button */
         .login-btn {
-            width: 100%; padding: 14px;
-            background: linear-gradient(135deg, var(--accent), var(--accent-dark));
-            color: #000; border: none; border-radius: 10px;
+            width: 100%; padding: 15px;
+            background: linear-gradient(135deg, var(--neon-blue), #0072ff);
+            color: #fff; border: none; border-radius: 10px;
             font-family: 'Inter', sans-serif;
-            font-size: 0.9rem; font-weight: 700;
-            text-transform: uppercase; letter-spacing: 1px;
-            cursor: pointer;
-            transition: all 0.25s var(--ease);
-            box-shadow: 0 4px 20px var(--accent-glow);
+            font-size: 0.9rem; font-weight: 900;
+            text-transform: uppercase; letter-spacing: 2px;
+            cursor: pointer; transition: all 0.3s;
+            box-shadow: 0 10px 20px rgba(0, 210, 255, 0.2);
         }
 
-        .login-btn:hover {
+        .login-btn:hover:not(:disabled) {
             transform: translateY(-2px);
-            box-shadow: 0 8px 28px var(--accent-glow);
+            box-shadow: 0 15px 30px rgba(0, 210, 255, 0.3);
+            filter: brightness(1.1);
         }
-
-        .login-btn:active { transform: translateY(0); }
 
         .login-btn:disabled {
-            opacity: 0.5; cursor: not-allowed; transform: none !important;
+            opacity: 0.5; cursor: not-allowed;
         }
 
-        .login-btn .spinner {
+        .footer-text {
+            margin-top: 35px; font-size: 0.65rem;
+            color: var(--text-dim); text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+
+        .spinner {
             display: none; width: 18px; height: 18px;
-            border: 2px solid rgba(0,0,0,0.2);
-            border-top-color: #000;
-            border-radius: 50%;
-            animation: spin 0.6s linear infinite;
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            border-top-color: #fff; border-radius: 50%;
+            animation: spin 0.8s linear infinite;
             margin: 0 auto;
         }
-
-        .login-btn.loading .btn-text { display: none; }
-        .login-btn.loading .spinner { display: inline-block; }
-
         @keyframes spin { to { transform: rotate(360deg); } }
-
-        .login-footer {
-            margin-top: 32px; font-size: 0.7rem;
-            color: var(--text-muted); letter-spacing: 1px;
-        }
+        .loading .btn-text { display: none; }
+        .loading .spinner { display: block; }
     </style>
 </head>
 <body>
-    <div class="bg-grid"></div>
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
-
     <div class="login-container">
         <div class="login-card">
             <div class="login-logo">
-                <svg viewBox="0 0 64 64" fill="none" width="64" height="64">
-                    <path d="M32 4L4 18V46L32 60L60 46V18L32 4Z" fill="url(#lgGrad)" opacity="0.15"/>
-                    <path d="M32 4L4 18V46L32 60L60 46V18L32 4Z" stroke="url(#lgGrad)" stroke-width="2.5"/>
-                    <path d="M22 32C22 26.48 26.48 22 32 22C37.52 22 42 26.48 42 32C42 37.52 37.52 42 32 42" stroke="url(#lgGrad)" stroke-width="2.5" stroke-linecap="round"/>
-                    <circle cx="32" cy="32" r="5" fill="url(#lgGrad)"/>
+                <svg viewBox="0 0 24 24" fill="none" stroke="url(#lgGrad)" stroke-width="2">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z" fill="url(#lgGrad)" fill-opacity="0.1"/>
                     <defs>
-                        <linearGradient id="lgGrad" x1="4" y1="4" x2="60" y2="60">
-                            <stop stop-color="#FF8C00"/>
-                            <stop offset="1" stop-color="#FFD700"/>
+                        <linearGradient id="lgGrad" x1="0" y1="0" x2="24" y2="24">
+                            <stop offset="0" stop-color="#00d2ff"/>
+                            <stop offset="1" stop-color="#9d50bb"/>
                         </linearGradient>
                     </defs>
                 </svg>
             </div>
-            <h1 class="login-title">FlareCloud</h1>
-            <p class="login-subtitle">Enter License Key</p>
+            <h1 class="login-title">YETCLOUD</h1>
+            <p class="login-subtitle">Premium Access</p>
 
-            <div class="login-error" id="login-error"></div>
+            <div class="error-msg" id="login-error"></div>
 
-            <form id="login-form" autocomplete="off">
-                <div class="key-input-group">
-                    <label class="key-label" for="license-key">License Key</label>
-                    <div class="key-input-wrapper">
-                        <input type="text" id="license-key" class="key-input"
-                               placeholder="KEY-XXXX-XXXXXXX" spellcheck="false" autofocus>
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="position:absolute;left:14px;top:50%;transform:translateY(-50%);">
+            <form id="login-form">
+                <div class="input-group">
+                    <label class="input-label" for="license-key">License Key</label>
+                    <div class="input-wrapper">
+                        <input type="text" id="license-key" class="login-input" 
+                               placeholder="KEY-XXXXXX-XXXXXX" spellcheck="false" autofocus autocomplete="off">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                             <path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/>
                         </svg>
                     </div>
                 </div>
                 <button type="submit" class="login-btn" id="login-btn">
                     <span class="btn-text">Authenticate</span>
-                    <span class="spinner"></span>
+                    <div class="spinner"></div>
                 </button>
             </form>
 
-            <p class="login-footer">FlareCloud &middot; Made with ❤️</p>
+            <p class="footer-text">Security Guaranteed &middot; 2026</p>
         </div>
     </div>
 
@@ -301,12 +244,12 @@
                 if (data.success) {
                     window.location.href = '/';
                 } else {
-                    errorEl.textContent = data.error || 'Invalid key';
+                    errorEl.textContent = data.error || 'Invalid Access Key';
                     errorEl.classList.add('visible');
                     keyInput.select();
                 }
             } catch (err) {
-                errorEl.textContent = 'Connection error. Try again.';
+                errorEl.textContent = 'Connection Error';
                 errorEl.classList.add('visible');
             } finally {
                 btn.classList.remove('loading');

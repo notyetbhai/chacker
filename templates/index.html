@@ -3,346 +3,213 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlareCloud — Dashboard</title>
-    <meta name="description" content="FlareCloud Premium Checker Dashboard">
+    <title>YetCloud — Cyberpunk Dashboard</title>
+    <meta name="description" content="YetCloud Premium Checker Dashboard">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
+    <!-- Chart.js CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-    <!-- Animated Background -->
-    <div class="bg-grid"></div>
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
-    <div class="bg-glow bg-glow-3"></div>
 
-    <!-- Main Container -->
-    <div class="app-container">
-
+    <div class="app-wrapper">
         <!-- Header -->
-        <header class="header" id="app-header">
-            <div class="header-left">
-                <div class="logo">
-                    <div class="logo-icon">
-                        <svg viewBox="0 0 40 40" fill="none">
-                            <path d="M20 4L4 12V28L20 36L36 28V12L20 4Z" fill="url(#logoGrad)" opacity="0.2"/>
-                            <path d="M20 4L4 12V28L20 36L36 28V12L20 4Z" stroke="url(#logoGrad)" stroke-width="2"/>
-                            <path d="M14 20C14 16.6863 16.6863 14 20 14C23.3137 14 26 16.6863 26 20C26 23.3137 23.3137 26 20 26" stroke="url(#logoGrad)" stroke-width="2" stroke-linecap="round"/>
-                            <circle cx="20" cy="20" r="3" fill="url(#logoGrad)"/>
-                            <defs>
-                                <linearGradient id="logoGrad" x1="4" y1="4" x2="36" y2="36">
-                                    <stop stop-color="#FF8C00"/>
-                                    <stop offset="1" stop-color="#FFD700"/>
-                                </linearGradient>
-                            </defs>
-                        </svg>
-                    </div>
-                    <div class="logo-text">
-                        <h1>FlareCloud</h1>
-                        <span class="logo-subtitle">Premium Checker</span>
-                    </div>
+        <header class="app-header">
+            <div class="app-title">
+                <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#00d2ff" stroke-width="2.5">
+                    <path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/>
+                </svg>
+                <div>
+                    <h1>YETCLOUD</h1>
+                    <span class="app-subtitle">PREMIUM CHECKER</span>
                 </div>
             </div>
-            <div class="header-right">
+            <div class="header-right" style="display: flex; gap: 15px; align-items: center;">
                 {% if is_admin %}
-                <a href="/admin" class="admin-link" title="Key Management">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>
-                    Admin
+                <a href="/admin" class="btn-social" style="border-color: var(--neon-purple); color: var(--neon-purple);">
+                    ADMIN PANEL
                 </a>
                 {% endif %}
                 <div class="status-badge" id="status-badge">
-                    <span class="status-dot"></span>
-                    <span class="status-text">Idle</span>
+                    <span class="status-text" style="color: var(--text-dim); font-size: 0.7rem; font-weight: 700; text-transform: uppercase;">IDLE</span>
                 </div>
             </div>
         </header>
 
-        <!-- Configuration Section -->
-        <section class="config-section" id="config-section">
-            <div class="section-header">
-                <h2>
-                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                        <circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-2 2 2 2 0 01-2-2v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83 0 2 2 0 010-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 01-2-2 2 2 0 012-2h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 010-2.83 2 2 0 012.83 0l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 012-2 2 2 0 012 2v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 0 2 2 0 010 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 012 2 2 2 0 01-2 2h-.09a1.65 1.65 0 00-1.51 1z"/>
-                    </svg>
-                    Configuration
-                </h2>
-                <button class="btn-collapse" id="toggle-config" title="Toggle configuration">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="6 9 12 15 18 9"/></svg>
-                </button>
+        <!-- Configuration (Hidden initially or collapsible in logic) -->
+        <div id="config-grid" style="margin-bottom: 20px;">
+            <div class="action-bar" style="background: rgba(0,0,0,0.5); border: 1px solid var(--border); flex-wrap: wrap;">
+                <input type="url" id="webhook-url" placeholder="Main Webhook URL" style="flex: 1; min-width: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 8px 12px; color: #fff; border-radius: 4px; font-size: 0.8rem; outline: none;">
+                <input type="url" id="banned-webhook" placeholder="Banned Webhook URL" style="flex: 1; min-width: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 8px 12px; color: #fff; border-radius: 4px; font-size: 0.8rem; outline: none;">
+                <input type="url" id="unbanned-webhook" placeholder="Unbanned Webhook URL" style="flex: 1; min-width: 200px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 8px 12px; color: #fff; border-radius: 4px; font-size: 0.8rem; outline: none;">
+                <input type="number" id="thread-count" value="10" min="1" max="200" style="width: 80px; background: rgba(0,0,0,0.3); border: 1px solid var(--border); padding: 8px; color: var(--neon-cyan); text-align: center; border-radius: 4px; outline: none;">
+                <select id="proxy-type" style="background: rgba(0,0,0,0.3); border: 1px solid var(--border); color: #fff; padding: 8px; border-radius: 4px; outline: none;">
+                    <option value="4">Proxyless</option>
+                    <option value="1">HTTP/s</option>
+                    <option value="2">SOCKS4</option>
+                    <option value="3">SOCKS5</option>
+                </select>
             </div>
+        </div>
 
-            <div class="config-grid" id="config-grid">
-                <!-- Webhooks -->
-                <div class="config-card glass-card">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg>
-                        Discord Webhooks
-                    </h3>
-                    <div class="input-group">
-                        <label for="webhook-url">Main Webhook</label>
-                        <input type="url" id="webhook-url" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
-                    </div>
-                    <div class="input-group">
-                        <label for="banned-webhook">Banned Accounts Webhook</label>
-                        <input type="url" id="banned-webhook" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
-                    </div>
-                    <div class="input-group">
-                        <label for="unbanned-webhook">Unbanned Accounts Webhook</label>
-                        <input type="url" id="unbanned-webhook" placeholder="https://discord.com/api/webhooks/..." autocomplete="off">
-                    </div>
-                </div>
-
-                <!-- File Upload -->
-                <div class="config-card glass-card">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
-                        Files
-                    </h3>
-                    <div class="upload-zone" id="combo-dropzone">
-                        <input type="file" id="combo-file" accept=".txt" hidden>
-                        <div class="upload-content">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                            <p class="upload-label">Drop combo file or <span class="upload-browse">browse</span></p>
-                            <p class="upload-info" id="combo-info">No file selected</p>
-                        </div>
-                    </div>
-                    <div class="upload-zone" id="proxy-dropzone">
-                        <input type="file" id="proxy-file" accept=".txt" hidden>
-                        <div class="upload-content">
-                            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                            <p class="upload-label">Drop proxy file or <span class="upload-browse">browse</span></p>
-                            <p class="upload-info" id="proxy-info">No file selected</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Settings -->
-                <div class="config-card glass-card">
-                    <h3>
-                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><line x1="4" y1="21" x2="4" y2="14"/><line x1="4" y1="10" x2="4" y2="3"/><line x1="12" y1="21" x2="12" y2="12"/><line x1="12" y1="8" x2="12" y2="3"/><line x1="20" y1="21" x2="20" y2="16"/><line x1="20" y1="12" x2="20" y2="3"/><line x1="1" y1="14" x2="7" y2="14"/><line x1="9" y1="8" x2="15" y2="8"/><line x1="17" y1="16" x2="23" y2="16"/></svg>
-                        Settings
-                    </h3>
-                    <div class="input-group">
-                        <label for="thread-count">Threads <span class="hint">(5-10 recommended)</span></label>
-                        <input type="number" id="thread-count" value="5" min="1" max="100">
-                    </div>
-                    <div class="input-group">
-                        <label for="proxy-type">Proxy Type</label>
-                        <select id="proxy-type">
-                            <option value="1">HTTP/s</option>
-                            <option value="2">SOCKS4</option>
-                            <option value="3">SOCKS5</option>
-                            <option value="4" selected>None (Proxyless)</option>
-                            <option value="5">Auto Scraper</option>
-                        </select>
-                    </div>
-                    <div class="toggle-group">
-                        <label class="toggle-label" for="auto-proxy">
-                            <span>Auto Proxy Scraper</span>
-                            <span class="hint">Scrapes proxies automatically</span>
-                        </label>
-                        <label class="toggle-switch">
-                            <input type="checkbox" id="auto-proxy">
-                            <span class="toggle-slider"></span>
-                        </label>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Controls -->
-        <div class="controls-bar">
-            <button class="btn btn-start" id="btn-start">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><polygon points="5 3 19 12 5 21 5 3"/></svg>
-                Start Checking
+        <!-- Action Bar -->
+        <div class="action-bar">
+            <button class="btn-action btn-combo" id="combo-dropzone">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/></svg>
+                Load Combos
+                <input type="file" id="combo-file" hidden>
             </button>
-            <button class="btn btn-stop" id="btn-stop" disabled>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><rect x="6" y="6" width="12" height="12" rx="1"/></svg>
+            <button class="btn-action btn-proxy" id="proxy-dropzone">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                Load Proxies
+                <input type="file" id="proxy-file" hidden>
+            </button>
+            
+            <div style="flex: 1;"></div>
+
+            <button class="btn-action btn-start" id="btn-start">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M5 3l14 9-14 9V3z"/></svg>
+                Start
+            </button>
+            <button class="btn-action btn-stop" id="btn-stop" disabled>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/></svg>
                 Stop
             </button>
-            <button class="btn btn-download" id="btn-download" disabled>
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                Download ZIP
-            </button>
         </div>
 
-        <!-- Progress Bar -->
-        <div class="progress-section" id="progress-section" style="display:none;">
-            <div class="progress-header">
-                <span class="progress-label">Progress</span>
-                <span class="progress-value" id="progress-text">0 / 0</span>
+        <!-- Info Bar (File names) -->
+        <div style="display: flex; gap: 20px; margin-bottom: 20px; font-size: 0.7rem; color: var(--text-dim); padding-left: 10px;">
+            <span id="combo-info">Combos: 0</span>
+            <span id="proxy-info">Proxies: 0</span>
+        </div>
+
+        <!-- Hero Stats -->
+        <div class="stats-grid">
+            <div class="stat-card card-checked">
+                <span class="stat-label">Checked</span>
+                <div class="stat-value" id="progress-text">0</div>
             </div>
-            <div class="progress-bar-track">
-                <div class="progress-bar-fill" id="progress-fill" style="width: 0%"></div>
+            <div class="stat-card card-valid">
+                <span class="stat-label">Valid</span>
+                <div class="stat-value" id="stat-hits">0</div>
             </div>
-            <div class="progress-stats">
-                <div class="progress-stat">
-                    <span class="stat-label">CPM</span>
-                    <span class="stat-value" id="cpm-value">0</span>
-                </div>
-                <div class="progress-stat">
-                    <span class="stat-label">Retries</span>
-                    <span class="stat-value" id="retries-value">0</span>
-                </div>
-                <div class="progress-stat">
-                    <span class="stat-label">Errors</span>
-                    <span class="stat-value" id="errors-value">0</span>
-                </div>
+            <div class="stat-card card-invalid">
+                <span class="stat-label">Invalid</span>
+                <div class="stat-value" id="stat-bads">0</div>
+            </div>
+            <div class="stat-card card-2fa">
+                <span class="stat-label">MFA / 2FA</span>
+                <div class="stat-value" id="stat-mfa">0</div>
+            </div>
+            <div class="stat-card card-errors">
+                <span class="stat-label">Errors</span>
+                <div class="stat-value" id="errors-value">0</div>
             </div>
         </div>
 
-        <!-- Dashboard Stats -->
-        <section class="dashboard" id="dashboard" style="display:none;">
-            <div class="dashboard-grid">
-                <!-- Hits -->
-                <div class="stat-card stat-hits" id="card-hits">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-hits">0</span>
-                        <span class="stat-name">Hits</span>
-                    </div>
-                    <div class="stat-glow"></div>
-                </div>
+        <!-- Detailed Stats -->
+        <div class="stats-grid" style="grid-template-columns: repeat(7, 1fr); gap: 10px; margin-bottom: 30px;">
+            <div class="stat-card" style="padding: 12px; background: rgba(255,255,255,0.02);">
+                <span class="stat-label" style="font-size: 0.55rem;">SFA</span>
+                <div class="stat-value" id="stat-sfa" style="font-size: 1rem;">0</div>
+            </div>
+            <div class="stat-card" style="padding: 12px; background: rgba(255,255,255,0.02);">
+                <span class="stat-label" style="font-size: 0.55rem;">cBP</span>
+                <div class="stat-value" id="stat-twofa" style="font-size: 1rem;">0</div>
+            </div>
+            <div class="stat-card" style="padding: 12px; background: rgba(255,255,255,0.02);">
+                <span class="stat-label" style="font-size: 0.55rem;">XGPS</span>
+                <div class="stat-value" id="stat-xgp" style="font-size: 1rem;">0</div>
+            </div>
+            <div class="stat-card" style="padding: 12px; background: rgba(255,255,255,0.02);">
+                <span class="stat-label" style="font-size: 0.55rem;">XGPS+</span>
+                <div class="stat-value" id="stat-xgpu" style="font-size: 1rem;">0</div>
+            </div>
+            <div class="stat-card" style="padding: 12px; background: rgba(255,255,255,0.02);">
+                <span class="stat-label" style="font-size: 0.55rem;">Other</span>
+                <div class="stat-value" id="stat-other" style="font-size: 1rem;">0</div>
+            </div>
+            <div class="stat-card" style="padding: 12px; background: rgba(255,255,255,0.02);">
+                <span class="stat-label" style="font-size: 0.55rem;">Valid Mail</span>
+                <div class="stat-value" id="stat-valid" style="font-size: 1rem;">0</div>
+            </div>
+            <div class="stat-card" style="padding: 12px; background: rgba(255,255,255,0.02);">
+                <span class="stat-label" style="font-size: 0.55rem;">CPM</span>
+                <div class="stat-value" id="cpm-value" style="font-size: 1rem; color: var(--neon-purple);">0</div>
+            </div>
+        </div>
 
-                <!-- Bads -->
-                <div class="stat-card stat-bads" id="card-bads">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-bads">0</span>
-                        <span class="stat-name">Bads</span>
-                    </div>
-                    <div class="stat-glow"></div>
+        <!-- Split View (Chart + Log) -->
+        <div class="split-view">
+            <!-- Graph Panel -->
+            <div class="view-panel">
+                <div class="panel-header">
+                    <h3>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/>
+                        </svg>
+                        Live Checking Graph
+                    </h3>
                 </div>
-
-                <!-- SFA -->
-                <div class="stat-card stat-sfa" id="card-sfa">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-sfa">0</span>
-                        <span class="stat-name">Sda</span>
-                    </div>
-                    <div class="stat-glow"></div>
-                </div>
-
-                <!-- MFA -->
-                <div class="stat-card stat-mfa" id="card-mfa">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-mfa">0</span>
-                        <span class="stat-name">MFA</span>
-                    </div>
-                    <div class="stat-glow"></div>
-                </div>
-
-                <!-- 2FA / cBP -->
-                <div class="stat-card stat-twofa" id="card-twofa">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-twofa">0</span>
-                        <span class="stat-name">cBP</span>
-                    </div>
-                    <div class="stat-glow"></div>
-                </div>
-
-                <!-- XGPS (Xbox Game Pass) -->
-                <div class="stat-card stat-xgp" id="card-xgp">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="6" width="20" height="12" rx="2"/><path d="M12 12h.01"/><path d="M17 12h.01"/><path d="M7 12h.01"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-xgp">0</span>
-                        <span class="stat-name">XGPS</span>
-                    </div>
-                    <div class="stat-glow"></div>
-                </div>
-
-                <!-- XGPU (Xbox Game Pass Ultimate) -->
-                <div class="stat-card stat-xgpu" id="card-xgpu">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-xgpu">0</span>
-                        <span class="stat-name">XGPS+</span>
-                    </div>
-                    <div class="stat-glow"></div>
-                </div>
-
-                <!-- Other -->
-                <div class="stat-card stat-other" id="card-other">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-other">0</span>
-                        <span class="stat-name">Other</span>
-                    </div>
-                    <div class="stat-glow"></div>
-                </div>
-
-                <!-- Valid Mail -->
-                <div class="stat-card stat-valid" id="card-valid">
-                    <div class="stat-icon">
-                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
-                    </div>
-                    <div class="stat-content">
-                        <span class="stat-count" id="stat-valid">0</span>
-                        <span class="stat-name">Vaild</span>
-                    </div>
-                    <div class="stat-glow"></div>
+                <div class="panel-content">
+                    <canvas id="checkingChart"></canvas>
                 </div>
             </div>
-        </section>
 
-        <!-- Live Preview Terminal -->
-        <section class="live-preview" id="live-preview" style="display:none;">
-            <div class="preview-header">
-                <div class="preview-title">
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/></svg>
-                    <span>Live Preview</span>
-                    <span class="preview-count" id="log-count">0 lines</span>
+            <!-- Log Panel -->
+            <div class="view-panel">
+                <div class="panel-header">
+                    <h3>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                            <polyline points="4 17 10 11 4 5"/><line x1="12" y1="19" x2="20" y2="19"/>
+                        </svg>
+                        Live Log
+                    </h3>
+                    <div style="display: flex; gap: 10px;">
+                         <span id="log-count" style="font-size: 0.6rem; color: var(--text-dim);">0 Lines</span>
+                         <button id="btn-clear-log" style="background: none; border: none; color: var(--neon-red); cursor: pointer; font-size: 0.6rem; font-weight: 700;">CLEAR</button>
+                    </div>
                 </div>
-                <div class="preview-controls">
-                    <label class="toggle-mini">
-                        <input type="checkbox" id="auto-scroll" checked>
-                        <span>Auto-scroll</span>
-                    </label>
-                    <button class="btn-icon" id="btn-clear-log" title="Clear log">
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 01-2 2H7a2 2 0 01-2-2V6m3 0V4a2 2 0 012-2h4a2 2 0 012 2v2"/></svg>
-                    </button>
-                </div>
-            </div>
-            <div class="preview-terminal" id="preview-terminal">
-                <div class="terminal-welcome">
-                    <span class="terminal-cursor">▍</span> Waiting for checker output...
+                <div class="panel-content terminal-container" id="preview-terminal">
+                    <!-- Logs will appear here -->
                 </div>
             </div>
-        </section>
+        </div>
 
         <!-- Footer -->
-        <footer class="footer">
-            <span>FlareCloud &middot; Made with ❤️</span>
-            <form action="/logout" method="POST" style="display:inline;">
-                <button type="submit" class="btn-logout">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-                    Logout
-                </button>
-            </form>
+        <footer class="app-footer">
+            <div class="social-links">
+                <a href="#" class="btn-social discord-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M20.3 4.4a19.7 19.7 0 00-4.9-1.5.1.1 0 00-.1 0 13.7 13.7 0 00-.6 1.2c-2.1-.3-4.2-.3-6.2 0a14.1 14.1 0 00-.7-1.2h-.1a19.7 19.7 0 00-4.8 1.5.1.1 0 00-.1 0C.2 8.7-.3 13 0 17.1v.1a20 20 0 006 3h.1l1.2-1.6h-.1a13 13 0 01-1.9-1c.1 0 .2-.1.3-.1 3.9 1.8 8.1 1.8 12 0 .1 0 .2.1.3.1a13 13 0 01-1.9 1h-.1L17 20.1l.2.1a20 20 0 006-3.1v-.1c.4-5-.6-9.1-2.9-12.7z"/></svg>
+                    Discord
+                </a>
+                <a href="#" class="btn-social github-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12c0 5.3 3.4 9.8 8.2 11.4.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1.1 1.8 2.8 1.3 3.5 1 .1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2.9-.3 2-.4 3-.4s2.1.1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2V21.4c0 .3.2.7.8.6A12 12 0 0024 12c0-6.6-5.4-12-12-12z"/></svg>
+                    GitHub
+                </a>
+                <a href="#" class="btn-social telegram-btn">
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12c0 5.3 3.4 9.8 8.2 11.4.6.1.8-.3.8-.6v-2.2c-3.3.7-4-1.4-4-1.4-.5-1.4-1.3-1.8-1.3-1.8-1.1-.7.1-.7.1-.7 1.2.1 1.9 1.2 1.9 1.2 1.1 1.8 2.8 1.3 3.5 1.0.1-.8.4-1.3.8-1.6-2.7-.3-5.5-1.3-5.5-5.9 0-1.3.5-2.4 1.2-3.2-.1-.3-.5-1.5.1-3.2 0 0 1-.3 3.3 1.2.9-.3 2-.4 3-.4s2.1.1 3 .4c2.3-1.5 3.3-1.2 3.3-1.2.6 1.6.2 2.9.1 3.2.8.8 1.2 1.9 1.2 3.2 0 4.6-2.8 5.6-5.5 5.9.4.4.8 1.1.8 2.2v2.2c0 .3.2.7.8.6A12 12 0 0024 12c0-6.6-5.4-12-12-12z"/></svg>
+                    Telegram
+                </a>
+            </div>
+            
+            <div style="display: flex; align-items: center; gap: 20px;">
+                <button class="btn-action btn-combo" style="padding: 5px 15px; font-size: 0.6rem;" id="btn-download" disabled>Download ZIP</button>
+                <div class="copyright">YetCloud © 2026 • Premium Suite</div>
+                <form action="/logout" method="POST" style="display:inline;">
+                    <button type="submit" style="background: none; border: none; color: var(--neon-red); font-size: 0.6rem; font-weight: 700; cursor: pointer; text-transform: uppercase;">Logout</button>
+                </form>
+            </div>
         </footer>
     </div>
+
+    <!-- Hidden legacy elements -->
+    <div id="progress-section" style="display:none;"><div id="progress-fill"></div></div>
+    <input type="checkbox" id="auto-scroll" checked hidden>
+    <div id="retries-value" hidden></div>
 
     <script src="/static/js/app.js"></script>
 </body>
 </html>
-

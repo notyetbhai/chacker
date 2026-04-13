@@ -1,5 +1,6 @@
 /**
- * FlareCloud Web Dashboard — Frontend Logic
+ * yetcloud Web Dashboard — Frontend Logic
+ * Cyberpunk Neon Version
  */
 
 const $ = (sel) => document.querySelector(sel);
@@ -11,8 +12,6 @@ const dom = {
     unbannedWebhook: $('#unbanned-webhook'),
     threadCount: $('#thread-count'),
     proxyType: $('#proxy-type'),
-    autoProxy: $('#auto-proxy'),
-    toggleConfig: $('#toggle-config'),
     configGrid: $('#config-grid'),
     comboDropzone: $('#combo-dropzone'),
     comboFile: $('#combo-file'),
@@ -24,14 +23,9 @@ const dom = {
     btnStop: $('#btn-stop'),
     btnDownload: $('#btn-download'),
     statusBadge: $('#status-badge'),
-    progressSection: $('#progress-section'),
-    progressFill: $('#progress-fill'),
-    progressText: $('#progress-text'),
+    progressText: $('#progress-text'), // This is now the "Checked" hero stat
     cpmValue: $('#cpm-value'),
-    retriesValue: $('#retries-value'),
     errorsValue: $('#errors-value'),
-    dashboard: $('#dashboard'),
-    livePreview: $('#live-preview'),
     previewTerminal: $('#preview-terminal'),
     logCount: $('#log-count'),
     autoScroll: $('#auto-scroll'),
@@ -51,6 +45,110 @@ let statusSource = null;
 let logSource = null;
 let previousValues = {};
 let logLineCount = 0;
+let checkingChart = null;
+let chartStartTime = null;
+
+// ═══════════════════════════════════════════
+//  Chart Initialization
+// ═══════════════════════════════════════════
+
+function initChart() {
+    const ctx = document.getElementById('checkingChart').getContext('2d');
+    
+    checkingChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: [],
+            datasets: [
+                {
+                    label: 'VALID',
+                    borderColor: '#00f5a0',
+                    backgroundColor: 'rgba(0, 245, 160, 0.1)',
+                    data: [],
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'INVALID',
+                    borderColor: '#ff0055',
+                    backgroundColor: 'rgba(255, 0, 85, 0.1)',
+                    data: [],
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: '2FA',
+                    borderColor: '#f9d423',
+                    backgroundColor: 'rgba(249, 212, 35, 0.1)',
+                    data: [],
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.4
+                },
+                {
+                    label: 'ERRORS',
+                    borderColor: '#ff7e5f',
+                    backgroundColor: 'rgba(255, 126, 95, 0.1)',
+                    data: [],
+                    borderWidth: 2,
+                    pointRadius: 0,
+                    fill: true,
+                    tension: 0.4
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    labels: { color: '#8892b0', font: { size: 10, weight: 'bold' } }
+                }
+            },
+            scales: {
+                x: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#555', maxTicksLimit: 10 }
+                },
+                y: {
+                    grid: { color: 'rgba(255, 255, 255, 0.05)' },
+                    ticks: { color: '#8892b0' },
+                    beginAtZero: true
+                }
+            },
+            animations: {
+                y: { duration: 0 }
+            }
+        }
+    });
+}
+
+function updateChart(data) {
+    if (!checkingChart) return;
+    
+    if (!chartStartTime) chartStartTime = Date.now();
+    const elapsed = Math.round((Date.now() - chartStartTime) / 1000);
+    
+    // Limit data points to show a sliding window
+    if (checkingChart.data.labels.length > 60) {
+        checkingChart.data.labels.shift();
+        checkingChart.data.datasets.forEach(ds => ds.data.shift());
+    }
+
+    checkingChart.data.labels.push(elapsed + 's');
+    checkingChart.data.datasets[0].data.push(data.hits);
+    checkingChart.data.datasets[1].data.push(data.bad);
+    checkingChart.data.datasets[2].data.push(data.mfa + data.twofa);
+    checkingChart.data.datasets[3].data.push(data.errors);
+    
+    checkingChart.update('none'); // Update without animation for performance
+}
 
 // ═══════════════════════════════════════════
 //  Toast Notifications
@@ -73,18 +171,6 @@ function toast(message, type = 'info') {
 }
 
 // ═══════════════════════════════════════════
-//  Config Toggle
-// ═══════════════════════════════════════════
-
-dom.toggleConfig.addEventListener('click', () => {
-    dom.configGrid.classList.toggle('collapsed');
-    dom.toggleConfig.classList.toggle('collapsed');
-});
-
-dom.autoProxy.addEventListener('change', () => { if (dom.autoProxy.checked) dom.proxyType.value = '5'; });
-dom.proxyType.addEventListener('change', () => { dom.autoProxy.checked = dom.proxyType.value === '5'; });
-
-// ═══════════════════════════════════════════
 //  File Upload
 // ═══════════════════════════════════════════
 
@@ -104,16 +190,14 @@ async function uploadFile(file, url, dropzone, infoEl) {
     const formData = new FormData();
     formData.append('file', file);
     infoEl.textContent = 'Uploading...';
-    infoEl.className = 'upload-info';
     try {
         const res = await fetch(url, { method: 'POST', body: formData });
         const data = await res.json();
         if (data.success) {
             dropzone.classList.add('uploaded');
             infoEl.textContent = data.unique !== undefined
-                ? `✓ ${data.filename} — ${data.unique} combos (${data.dupes} dupes removed)`
-                : `✓ ${data.filename} — ${data.count} proxies`;
-            infoEl.classList.add('loaded');
+                ? `${data.filename} — ${data.unique} combos`
+                : `${data.filename} — ${data.count} proxies`;
             toast(`${data.filename} loaded`, 'success');
         } else {
             infoEl.textContent = `Error: ${data.error}`;
@@ -134,16 +218,16 @@ setupDropzone(dom.proxyDropzone, dom.proxyFile, '/api/upload/proxies', dom.proxy
 
 dom.btnStart.addEventListener('click', async () => {
     const config = {
-        threads: parseInt(dom.threadCount.value) || 5,
+        threads: parseInt(dom.threadCount.value) || 10,
         proxyType: dom.proxyType.value,
         webhook: dom.webhookUrl.value,
         bannedWebhook: dom.bannedWebhook.value,
         unbannedWebhook: dom.unbannedWebhook.value,
     };
+    
     dom.btnStart.disabled = true;
     dom.btnStop.disabled = false;
     dom.btnDownload.disabled = true;
-    dom.btnDownload.classList.remove('ready');
 
     try {
         const res = await fetch('/api/start', {
@@ -153,8 +237,8 @@ dom.btnStart.addEventListener('click', async () => {
         });
         const data = await res.json();
         if (data.success) {
-            toast(`Checking started — ${data.total} combos`, 'success');
-            setStatus('running', 'Checking...');
+            toast(`Started — ${data.total} combos`, 'success');
+            setStatus('RUNNING', '#00f5a0');
             showDashboard();
             startSSE();
             startLogSSE();
@@ -174,14 +258,14 @@ dom.btnStop.addEventListener('click', async () => {
     try {
         const res = await fetch('/api/stop', { method: 'POST' });
         const data = await res.json();
-        if (data.success) toast('Stopping checker...', 'info');
+        if (data.success) toast('Stopping...', 'info');
     } catch (err) { toast('Failed to stop', 'error'); }
 });
 
 dom.btnDownload.addEventListener('click', () => { window.location.href = '/api/download'; });
 
 // ═══════════════════════════════════════════
-//  SSE — Stats Stream
+//  SSE Streams
 // ═══════════════════════════════════════════
 
 function startSSE() {
@@ -191,10 +275,10 @@ function startSSE() {
         try {
             const data = JSON.parse(event.data);
             updateDashboard(data);
+            updateChart(data);
             if (data.finished) onFinished();
         } catch (e) {}
     };
-    statusSource.onerror = () => {};
 }
 
 function updateDashboard(data) {
@@ -207,12 +291,28 @@ function updateDashboard(data) {
     animateStat(dom.statXgpu, 'xgpu', data.xgpu);
     animateStat(dom.statOther, 'other', data.other);
     animateStat(dom.statValid, 'vm', data.vm);
-    const pct = data.total > 0 ? ((data.checked / data.total) * 100).toFixed(1) : 0;
-    dom.progressFill.style.width = pct + '%';
-    dom.progressText.textContent = `${data.checked} / ${data.total}`;
+    
+    dom.progressText.textContent = data.checked;
     dom.cpmValue.textContent = data.cpm || 0;
-    dom.retriesValue.textContent = data.retries;
     dom.errorsValue.textContent = data.errors;
+
+    // If we receive data that indicates it is running, update UI state
+    if (data.running && dom.btnStart.disabled === false) {
+        dom.btnStart.disabled = true;
+        dom.btnStop.disabled = false;
+        setStatus('RUNNING', '#00f5a0');
+    }
+
+    // Enable download if finished
+    if (data.finished) {
+        dom.btnDownload.disabled = false;
+        dom.btnDownload.classList.add('ready');
+        if (dom.btnStart.disabled) {
+             dom.btnStart.disabled = false;
+             dom.btnStop.disabled = true;
+             setStatus('FINISHED', 'var(--neon-blue)');
+        }
+    }
 }
 
 function animateStat(el, key, newValue) {
@@ -225,10 +325,6 @@ function animateStat(el, key, newValue) {
     }
 }
 
-// ═══════════════════════════════════════════
-//  SSE — Live Log Stream
-// ═══════════════════════════════════════════
-
 function startLogSSE() {
     if (logSource) logSource.close();
     logSource = new EventSource('/api/logs');
@@ -238,37 +334,34 @@ function startLogSSE() {
             appendLogLine(entry);
         } catch (e) {}
     };
-    logSource.onerror = () => {};
 }
 
-const TAG_LABELS = {
-    hit: 'HIT', bad: 'BAD', twofa: '2FA', valid: 'MAIL',
-    xgp: 'XGP', xgpu: 'XGPU', other: 'OTHER',
-    system: 'SYS', error: 'ERR', info: 'LOG'
+const TAG_COLORS = {
+    hit: '#00f5a0', bad: '#ff0055', twofa: '#f9d423', valid: '#ff00d4',
+    xgp: '#00d2ff', xgpu: '#f9d423', other: '#ff7e5f',
+    system: '#9d50bb', error: '#ff0055', info: '#8892b0'
 };
 
 function appendLogLine(entry) {
-    // Remove welcome message on first log
-    const welcome = dom.previewTerminal.querySelector('.terminal-welcome');
-    if (welcome) welcome.remove();
-
     const line = document.createElement('div');
-    line.className = `log-line ${entry.type}`;
-
-    const tag = TAG_LABELS[entry.type] || 'LOG';
-    line.innerHTML = `<span class="log-time">${entry.time}</span><span class="log-tag">${tag}</span><span class="log-text">${escapeHtml(entry.text)}</span>`;
+    line.className = `log-line`;
+    
+    const color = TAG_COLORS[entry.type] || '#8892b0';
+    const tag = (entry.type || 'LOG').toUpperCase();
+    
+    line.innerHTML = `
+        <span class="log-time">[${entry.time}]</span>
+        <span class="log-tag" style="color: ${color}">[${tag}]</span>
+        <span class="log-text">${escapeHtml(entry.text)}</span>
+    `;
 
     dom.previewTerminal.appendChild(line);
     logLineCount++;
-    dom.logCount.textContent = `${logLineCount} lines`;
+    dom.logCount.textContent = `${logLineCount} Lines`;
 
-    // Auto-scroll
-    if (dom.autoScroll.checked) {
-        dom.previewTerminal.scrollTop = dom.previewTerminal.scrollHeight;
-    }
+    dom.previewTerminal.scrollTop = dom.previewTerminal.scrollHeight;
 
-    // Limit visible lines to 500 for performance
-    while (dom.previewTerminal.children.length > 500) {
+    while (dom.previewTerminal.children.length > 200) {
         dom.previewTerminal.removeChild(dom.previewTerminal.firstChild);
     }
 }
@@ -279,46 +372,54 @@ function escapeHtml(text) {
     return div.innerHTML;
 }
 
-// Clear log button
 dom.btnClearLog.addEventListener('click', () => {
     dom.previewTerminal.innerHTML = '';
     logLineCount = 0;
-    dom.logCount.textContent = '0 lines';
+    dom.logCount.textContent = '0 Lines';
 });
 
 // ═══════════════════════════════════════════
-//  UI State
+//  UI State Management
 // ═══════════════════════════════════════════
 
 function onFinished() {
     if (statusSource) { statusSource.close(); statusSource = null; }
     if (logSource) { logSource.close(); logSource = null; }
-    setStatus('finished', 'Finished');
+    setStatus('FINISHED', 'var(--neon-blue)');
     dom.btnStart.disabled = false;
     dom.btnStop.disabled = true;
     dom.btnDownload.disabled = false;
-    dom.btnDownload.classList.add('ready');
-    toast('🎉 Checking complete! Download your results.', 'success');
+    toast('🎉 Complete!', 'success');
 }
 
-function setStatus(state, text) {
-    dom.statusBadge.className = 'status-badge ' + state;
+function setStatus(text, color) {
     dom.statusBadge.querySelector('.status-text').textContent = text;
+    dom.statusBadge.querySelector('.status-text').style.color = color;
 }
 
 function showDashboard() {
-    dom.progressSection.style.display = 'block';
-    dom.dashboard.style.display = 'block';
-    dom.livePreview.style.display = 'block';
     previousValues = {};
     logLineCount = 0;
+    chartStartTime = null;
+    if (checkingChart) {
+        checkingChart.data.labels = [];
+        checkingChart.data.datasets.forEach(ds => ds.data = []);
+        checkingChart.update();
+    }
+    
     [dom.statHits, dom.statBads, dom.statSfa, dom.statMfa, dom.statTwofa,
      dom.statXgp, dom.statXgpu, dom.statOther, dom.statValid].forEach(el => el.textContent = '0');
-    dom.progressFill.style.width = '0%';
-    dom.progressText.textContent = '0 / 0';
+    dom.progressText.textContent = '0';
     dom.cpmValue.textContent = '0';
-    dom.retriesValue.textContent = '0';
     dom.errorsValue.textContent = '0';
-    dom.previewTerminal.innerHTML = '<div class="terminal-welcome"><span class="terminal-cursor">▍</span> Waiting for checker output...</div>';
-    dom.logCount.textContent = '0 lines';
+    dom.previewTerminal.innerHTML = '';
+    dom.logCount.textContent = '0 Lines';
 }
+
+// Initial Setup
+document.addEventListener('DOMContentLoaded', () => {
+    initChart();
+    // Auto-connect to catch updates if already running
+    startSSE();
+    startLogSSE();
+});

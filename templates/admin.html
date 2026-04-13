@@ -1,137 +1,376 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FlareCloud — Admin Panel</title>
+    <title>YetCloud — Cyberpunk Admin</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700&display=swap"
+        rel="stylesheet">
     <link rel="stylesheet" href="/static/css/style.css">
     <style>
-        .admin-container { max-width: 800px; margin: 0 auto; padding: 32px 24px; position: relative; z-index: 1; }
-        .admin-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 32px; }
-        .admin-header h1 { font-size: 1.4rem; font-weight: 800; background: linear-gradient(135deg, #FF8C00, #FFD700); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .admin-nav { display: flex; gap: 10px; }
-        .admin-nav a { color: var(--text-secondary); text-decoration: none; font-size: 0.8rem; padding: 6px 14px; border: 1px solid var(--border); border-radius: 6px; transition: all 0.2s; }
-        .admin-nav a:hover { border-color: var(--accent); color: var(--accent); }
+        :root {
+            --bg-dark: #05070a;
+            --bg-card: rgba(13, 20, 30, 0.85);
+            --border: rgba(255, 255, 255, 0.1);
+            --neon-blue: #00d2ff;
+            --neon-cyan: #00f2fe;
+            --neon-purple: #9d50bb;
+            --neon-green: #00f5a0;
+            --neon-red: #ff0055;
+            --text-main: #e0e6ed;
+            --text-dim: #8892b0;
+            --radius: 12px;
+        }
 
-        .key-section { margin-bottom: 32px; }
-        .key-section-title { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 600; margin-bottom: 16px; display: flex; align-items: center; gap: 8px; }
-        .key-section-title svg { color: var(--accent); }
+        body {
+            background: var(--bg-dark);
+            background-image:
+                radial-gradient(circle at 10% 20%, rgba(0, 210, 255, 0.05) 0%, transparent 40%),
+                radial-gradient(circle at 90% 80%, rgba(157, 80, 187, 0.05) 0%, transparent 40%);
+            min-height: 100vh;
+        }
 
-        .create-form { display: flex; gap: 10px; margin-bottom: 24px; flex-wrap: wrap; align-items: flex-end; }
-        .create-form .field { display: flex; flex-direction: column; gap: 4px; }
-        .create-form .field label { font-size: 0.7rem; text-transform: uppercase; letter-spacing: 0.5px; color: var(--text-muted); font-weight: 500; }
-        .create-form input, .create-form select { padding: 10px 14px; background: var(--bg-input); border: 1px solid var(--border); border-radius: 8px; color: var(--text-primary); font-family: 'JetBrains Mono', monospace; font-size: 0.8rem; outline: none; transition: border-color 0.2s; }
-        .create-form input:focus, .create-form select:focus { border-color: rgba(255,140,0,0.5); }
-        .create-form select { font-family: 'Inter', sans-serif; }
-        .create-form select option { background: #12121A; }
+        .admin-page-wrap {
+            max-width: 900px;
+            margin: 40px auto;
+            padding: 0 20px;
+        }
 
-        .btn-create { padding: 10px 20px; background: linear-gradient(135deg, #FF8C00, #CC7000); color: #000; border: none; border-radius: 8px; font-family: 'Inter', sans-serif; font-size: 0.8rem; font-weight: 700; cursor: pointer; text-transform: uppercase; letter-spacing: 0.5px; transition: all 0.2s; box-shadow: 0 4px 12px rgba(255,140,0,0.3); }
-        .btn-create:hover { transform: translateY(-1px); box-shadow: 0 6px 16px rgba(255,140,0,0.4); }
+        .admin-header-card {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 25px 30px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-top: 3px solid var(--neon-purple);
+        }
 
-        .keys-list { display: flex; flex-direction: column; gap: 8px; }
-        .key-card { display: flex; align-items: center; justify-content: space-between; padding: 14px 18px; background: var(--bg-card); border: 1px solid var(--border); border-radius: 10px; transition: all 0.2s; }
-        .key-card:hover { border-color: rgba(255,140,0,0.2); background: rgba(24,24,38,0.85); }
-        .key-info { display: flex; flex-direction: column; gap: 4px; flex: 1; }
-        .key-value { font-family: 'JetBrains Mono', monospace; font-size: 0.85rem; color: var(--accent); font-weight: 600; letter-spacing: 0.5px; }
-        .key-meta { display: flex; gap: 12px; font-size: 0.7rem; color: var(--text-muted); }
-        .key-meta .label-tag { background: rgba(255,140,0,0.1); color: var(--accent); padding: 1px 8px; border-radius: 4px; font-weight: 500; }
-        .key-meta .expires-tag { color: var(--green); }
-        .key-meta .expires-tag.expired { color: var(--red); }
-        .key-meta .type-tag { background: rgba(0,230,118,0.1); color: var(--green); padding: 1px 8px; border-radius: 4px; }
-        .key-meta .type-tag.temp { background: rgba(255,171,64,0.1); color: #FFAB40; }
+        .admin-nav-links {
+            display: flex;
+            gap: 15px;
+        }
 
-        .btn-delete { background: rgba(255,82,82,0.08); border: 1px solid rgba(255,82,82,0.2); color: var(--red); padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; }
-        .btn-delete:hover { background: rgba(255,82,82,0.15); border-color: rgba(255,82,82,0.4); }
-        .btn-copy { background: rgba(68,138,255,0.08); border: 1px solid rgba(68,138,255,0.2); color: #448AFF; padding: 6px 12px; border-radius: 6px; font-size: 0.7rem; font-weight: 600; cursor: pointer; transition: all 0.2s; font-family: 'Inter', sans-serif; text-transform: uppercase; letter-spacing: 0.5px; margin-right: 8px; }
-        .btn-copy:hover { background: rgba(68,138,255,0.15); }
+        .admin-nav-links a {
+            color: var(--neon-cyan);
+            text-decoration: none;
+            font-size: 0.75rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            padding: 8px 15px;
+            border: 1px solid rgba(0, 210, 255, 0.2);
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
 
-        .empty-state { text-align: center; padding: 32px; color: var(--text-muted); font-size: 0.85rem; }
+        .admin-nav-links a:hover {
+            background: rgba(0, 210, 255, 0.1);
+            border-color: var(--neon-blue);
+        }
 
-        .created-popup { position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(18,18,28,0.95); backdrop-filter: blur(24px); border: 1px solid rgba(255,140,0,0.3); border-radius: 16px; padding: 32px; text-align: center; z-index: 9999; min-width: 380px; box-shadow: 0 24px 80px rgba(0,0,0,0.6); animation: cardIn 0.3s ease; display: none; }
-        .created-popup.visible { display: block; }
-        .created-popup h3 { color: var(--green); margin-bottom: 16px; font-size: 1rem; }
-        .created-popup .new-key { font-family: 'JetBrains Mono', monospace; font-size: 1.1rem; color: var(--accent); background: rgba(255,140,0,0.08); padding: 12px 20px; border-radius: 8px; border: 1px solid rgba(255,140,0,0.2); margin-bottom: 16px; letter-spacing: 1px; user-select: all; }
-        .created-popup .popup-meta { font-size: 0.75rem; color: var(--text-muted); margin-bottom: 20px; }
-        .created-popup .btn-close-popup { padding: 10px 24px; background: rgba(255,255,255,0.06); border: 1px solid var(--border); color: var(--text-secondary); border-radius: 8px; cursor: pointer; font-family: 'Inter', sans-serif; font-size: 0.8rem; transition: all 0.2s; }
-        .created-popup .btn-close-popup:hover { border-color: var(--accent); color: var(--accent); }
-        .overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 9998; display: none; }
-        .overlay.visible { display: block; }
+        .key-section-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(20px);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
 
-        @keyframes cardIn { from { opacity: 0; transform: translate(-50%,-50%) scale(0.9); } to { opacity: 1; transform: translate(-50%,-50%) scale(1); } }
+        .key-section-header {
+            font-size: 0.8rem;
+            font-weight: 900;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 25px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .key-section-header svg {
+            color: var(--neon-purple);
+        }
+
+        .creation-grid {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            align-items: flex-end;
+            margin-bottom: 30px;
+        }
+
+        .form-field {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .form-field label {
+            font-size: 0.65rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .form-field input,
+        .form-field select {
+            background: rgba(0, 0, 0, 0.3);
+            border: 1px solid var(--border);
+            padding: 10px 15px;
+            border-radius: 8px;
+            color: var(--neon-cyan);
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 0.8rem;
+            outline: none;
+        }
+
+        .form-field input:focus,
+        .form-field select:focus {
+            border-color: var(--neon-purple);
+        }
+
+        .btn-gen {
+            background: linear-gradient(135deg, var(--neon-purple), #6e48aa);
+            color: #fff;
+            border: none;
+            padding: 11px 25px;
+            border-radius: 8px;
+            font-size: 0.8rem;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            cursor: pointer;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(157, 80, 187, 0.2);
+        }
+
+        .btn-gen:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(157, 80, 187, 0.3);
+        }
+
+        .key-item {
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--border);
+            padding: 15px 20px;
+            border-radius: 10px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            transition: all 0.3s;
+        }
+
+        .key-item:hover {
+            border-color: rgba(255, 255, 255, 0.2);
+            background: rgba(0, 0, 0, 0.3);
+        }
+
+        .key-txt {
+            font-family: 'JetBrains Mono', monospace;
+            color: var(--neon-blue);
+            font-weight: 700;
+            font-size: 0.9rem;
+        }
+
+        .key-tag {
+            font-size: 0.6rem;
+            font-weight: 800;
+            background: rgba(0, 210, 255, 0.1);
+            color: var(--neon-blue);
+            padding: 2px 8px;
+            border-radius: 4px;
+            text-transform: uppercase;
+        }
+
+        .key-tag.temp {
+            background: rgba(249, 212, 35, 0.1);
+            color: var(--neon-yellow);
+        }
+
+        .key-tag.exp {
+            background: rgba(255, 0, 85, 0.1);
+            color: var(--neon-red);
+        }
+
+        .btn-action-small {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--border);
+            color: var(--text-dim);
+            padding: 5px 12px;
+            border-radius: 6px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+        }
+
+        .btn-action-small:hover {
+            color: #fff;
+            border-color: #fff;
+        }
+
+        .btn-del-small:hover {
+            color: var(--neon-red);
+            border-color: var(--neon-red);
+            background: rgba(255, 0, 85, 0.1);
+        }
+
+        /* Popup */
+        .modal-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(10px);
+            z-index: 100;
+            display: none;
+        }
+
+        .modal-overlay.active {
+            display: block;
+        }
+
+        .modal-card {
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--bg-card);
+            border: 1px solid var(--neon-green);
+            padding: 40px;
+            border-radius: 16px;
+            z-index: 101;
+            text-align: center;
+            width: 450px;
+            display: none;
+        }
+
+        .modal-card.active {
+            display: block;
+            animation: zoomIn 0.3s ease;
+        }
+
+        @keyframes zoomIn {
+            from {
+                opacity: 0;
+                transform: translate(-50%, -45%) scale(0.9);
+            }
+
+            to {
+                opacity: 1;
+                transform: translate(-50%, -50%) scale(1);
+            }
+        }
+
+        .modal-card h2 {
+            color: var(--neon-green);
+            font-size: 1.2rem;
+            text-transform: uppercase;
+            margin-bottom: 20px;
+        }
+
+        .modal-key-display {
+            font-family: 'JetBrains Mono', monospace;
+            font-size: 1.2rem;
+            color: var(--neon-cyan);
+            background: rgba(0, 0, 0, 0.4);
+            padding: 15px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-bottom: 20px;
+            word-break: break-all;
+        }
     </style>
 </head>
+
 <body>
-    <div class="bg-grid"></div>
-    <div class="bg-glow bg-glow-1"></div>
-    <div class="bg-glow bg-glow-2"></div>
-
-    <div class="admin-container">
-        <div class="admin-header">
-            <h1>🔑 Key Management</h1>
-            <div class="admin-nav">
-                <a href="/">← Dashboard</a>
-                <form action="/logout" method="POST" style="display:inline;"><button type="submit" class="btn-logout" style="font-size:0.8rem;">Logout</button></form>
+    <div class="admin-page-wrap">
+        <header class="admin-header-card">
+            <div style="display: flex; align-items: center; gap: 12px;">
+                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="var(--neon-purple)"
+                    stroke-width="2.5">
+                    <path
+                        d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 1 1-7.778 7.778 5.5 5.5 0 0 1 7.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4" />
+                </svg>
+                <div style="font-weight: 900; font-size: 1.2rem; letter-spacing: 1px; color: #fff;">ADMIN ACCESS</div>
             </div>
-        </div>
+            <nav class="admin-nav-links">
+                <a href="/">Dashboard</a>
+                <form action="/logout" method="POST" style="display:inline;">
+                    <button type="submit"
+                        style="background: none; border: none; color: var(--neon-red); font-weight: 700; font-size: 0.7rem; cursor: pointer; text-transform: uppercase;">Logout</button>
+                </form>
+            </nav>
+        </header>
 
-        <!-- Create Temp Key -->
-        <div class="key-section">
-            <div class="key-section-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
-                Create Temporary Key
+        <section class="key-section-panel">
+            <div class="key-section-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M12 5v14M5 12h14" />
+                </svg>
+                Generate Temporary Key
             </div>
-            <div class="create-form">
-                <div class="field">
+            <div class="creation-grid">
+                <div class="form-field">
                     <label>Label</label>
-                    <input type="text" id="key-label" placeholder="e.g. User123" value="Temporary Key">
+                    <input type="text" id="key-label" placeholder="e.g. TestUser" value="Temporary Key">
                 </div>
-                <div class="field">
-                    <label>Duration</label>
+                <div class="form-field">
+                    <label>Valid For</label>
                     <select id="key-duration">
                         <option value="1">1 Hour</option>
                         <option value="6">6 Hours</option>
-                        <option value="12">12 Hours</option>
                         <option value="24" selected>24 Hours</option>
-                        <option value="72">3 Days</option>
                         <option value="168">7 Days</option>
                         <option value="720">30 Days</option>
                     </select>
                 </div>
-                <button class="btn-create" id="btn-create-key">+ Generate Key</button>
+                <button class="btn-gen" id="btn-create-key">GENERATE</button>
             </div>
-        </div>
+        </section>
 
-        <!-- Permanent Keys -->
-        <div class="key-section">
-            <div class="key-section-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <section class="key-section-panel" style="border-top: 1px solid rgba(255,255,255,0.05);">
+            <div class="key-section-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+                </svg>
                 Permanent Keys
             </div>
-            <div class="keys-list" id="permanent-keys"></div>
-        </div>
+            <div id="permanent-keys"></div>
+        </section>
 
-        <!-- Temporary Keys -->
-        <div class="key-section">
-            <div class="key-section-title">
-                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-                Temporary Keys
+        <section class="key-section-panel">
+            <div class="key-section-header">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3">
+                    <circle cx="12" cy="12" r="10" />
+                    <polyline points="12 6 12 12 16 14" />
+                </svg>
+                Temporary Vault
             </div>
-            <div class="keys-list" id="temp-keys"></div>
-        </div>
+            <div id="temp-keys"></div>
+        </section>
     </div>
 
-    <!-- Created Popup -->
-    <div class="overlay" id="overlay"></div>
-    <div class="created-popup" id="created-popup">
-        <h3>✓ Key Created Successfully</h3>
-        <div class="new-key" id="new-key-display"></div>
-        <div class="popup-meta" id="popup-meta"></div>
-        <button class="btn-copy" id="btn-copy-new" style="margin-bottom:12px;">Copy Key</button>
-        <br>
-        <button class="btn-close-popup" id="btn-close-popup">Close</button>
+    <div class="modal-overlay" id="overlay"></div>
+    <div class="modal-card" id="created-popup">
+        <h2>✓ Key Generated</h2>
+        <div class="modal-key-display" id="new-key-display"></div>
+        <p id="popup-meta" style="font-size: 0.7rem; color: var(--text-dim); margin-bottom: 25px;"></p>
+        <button class="btn-gen" id="btn-copy-new"
+            style="background: var(--neon-cyan); margin-bottom: 10px; width: 100%;">COPY ACCESS KEY</button>
+        <button class="btn-action-small" id="btn-close-popup" style="width: 100%; padding: 10px;">DISMISS</button>
     </div>
 
     <script>
@@ -145,18 +384,18 @@
         function renderPermanent(keys) {
             const container = document.getElementById('permanent-keys');
             if (keys.length === 0) {
-                container.innerHTML = '<div class="empty-state">No permanent keys</div>';
+                container.innerHTML = '<div style="color:var(--text-dim); font-size:0.8rem;">No Permanent Sessions</div>';
                 return;
             }
             container.innerHTML = keys.map(k => `
-                <div class="key-card">
-                    <div class="key-info">
-                        <div class="key-value">${k}</div>
-                        <div class="key-meta"><span class="type-tag">PERMANENT</span></div>
+                <div class="key-item">
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <span class="key-txt">${k}</span>
+                        <span class="key-tag">MASTER ACCESS</span>
                     </div>
-                    <div>
-                        <button class="btn-copy" onclick="copyKey('${k}')">Copy</button>
-                        <button class="btn-delete" onclick="deleteKey('${k}')">Delete</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-action-small" onclick="copyKey('${k}')">COPY</button>
+                        <button class="btn-action-small btn-del-small" onclick="deleteKey('${k}')">REVOKE</button>
                     </div>
                 </div>
             `).join('');
@@ -165,48 +404,39 @@
         function renderTemp(keys) {
             const container = document.getElementById('temp-keys');
             if (keys.length === 0) {
-                container.innerHTML = '<div class="empty-state">No temporary keys — create one above</div>';
+                container.innerHTML = '<div style="color:var(--text-dim); font-size:0.8rem;">No Temporary Sessions</div>';
                 return;
             }
             const now = new Date();
             container.innerHTML = keys.map(tk => {
                 const exp = new Date(tk.expires);
                 const remaining = exp - now;
-                let timeStr;
-                if (remaining <= 0) { timeStr = 'EXPIRED'; }
-                else if (remaining < 3600000) { timeStr = Math.ceil(remaining/60000) + 'm remaining'; }
-                else if (remaining < 86400000) { timeStr = Math.ceil(remaining/3600000) + 'h remaining'; }
-                else { timeStr = Math.ceil(remaining/86400000) + 'd remaining'; }
-                const isExpired = remaining <= 0;
+                let timeStr = remaining <= 0 ? 'EXPIRED' : Math.ceil(remaining / 3600000) + 'h Left';
                 return `
-                <div class="key-card">
-                    <div class="key-info">
-                        <div class="key-value">${tk.key}</div>
-                        <div class="key-meta">
-                            <span class="type-tag temp">TEMP</span>
-                            <span class="label-tag">${tk.label || ''}</span>
-                            <span class="expires-tag ${isExpired ? 'expired' : ''}">${timeStr}</span>
+                <div class="key-item">
+                    <div style="display: flex; flex-direction: column; gap: 5px;">
+                        <span class="key-txt">${tk.key}</span>
+                        <div style="display: flex; gap: 8px;">
+                            <span class="key-tag temp">${tk.label}</span>
+                            <span class="key-tag ${remaining <= 0 ? 'exp' : ''}">${timeStr}</span>
                         </div>
                     </div>
-                    <div>
-                        <button class="btn-copy" onclick="copyKey('${tk.key}')">Copy</button>
-                        <button class="btn-delete" onclick="deleteKey('${tk.key}')">Delete</button>
+                    <div style="display: flex; gap: 8px;">
+                        <button class="btn-action-small" onclick="copyKey('${tk.key}')">COPY</button>
+                        <button class="btn-action-small btn-del-small" onclick="deleteKey('${tk.key}')">REVOKE</button>
                     </div>
                 </div>`;
             }).join('');
         }
 
         function copyKey(key) {
-            navigator.clipboard.writeText(key).then(() => {
-                const btns = document.querySelectorAll('.btn-copy');
-                btns.forEach(b => { if (b.textContent === 'Copied!') b.textContent = 'Copy'; });
-                event.target.textContent = 'Copied!';
-                setTimeout(() => { event.target.textContent = 'Copy'; }, 2000);
-            });
+            navigator.clipboard.writeText(key);
+            event.target.textContent = 'COPIED';
+            setTimeout(() => { event.target.textContent = 'COPY'; }, 2000);
         }
 
         async function deleteKey(key) {
-            if (!confirm('Delete this key?')) return;
+            if (!confirm('Revoke access for this key?')) return;
             await fetch('/api/admin/keys/delete', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
@@ -216,7 +446,7 @@
         }
 
         document.getElementById('btn-create-key').addEventListener('click', async () => {
-            const label = document.getElementById('key-label').value || 'Temporary Key';
+            const label = document.getElementById('key-label').value;
             const hours = parseInt(document.getElementById('key-duration').value);
             const res = await fetch('/api/admin/keys/create', {
                 method: 'POST',
@@ -226,10 +456,9 @@
             const data = await res.json();
             if (data.success) {
                 document.getElementById('new-key-display').textContent = data.key;
-                const exp = new Date(data.expires);
-                document.getElementById('popup-meta').textContent = `Expires: ${exp.toLocaleString()} • Label: ${data.label}`;
-                document.getElementById('created-popup').classList.add('visible');
-                document.getElementById('overlay').classList.add('visible');
+                document.getElementById('popup-meta').textContent = `LABEL: ${data.label} • EXPIRES: ${new Date(data.expires).toLocaleString()}`;
+                document.getElementById('created-popup').classList.add('active');
+                document.getElementById('overlay').classList.add('active');
                 loadKeys();
             }
         });
@@ -237,20 +466,17 @@
         document.getElementById('btn-copy-new').addEventListener('click', () => {
             const key = document.getElementById('new-key-display').textContent;
             navigator.clipboard.writeText(key);
-            document.getElementById('btn-copy-new').textContent = 'Copied!';
-            setTimeout(() => { document.getElementById('btn-copy-new').textContent = 'Copy Key'; }, 2000);
+            document.getElementById('btn-copy-new').textContent = 'COPIED TO CLIPBOARD';
+            setTimeout(() => { document.getElementById('btn-copy-new').textContent = 'COPY ACCESS KEY'; }, 2000);
         });
 
         document.getElementById('btn-close-popup').addEventListener('click', () => {
-            document.getElementById('created-popup').classList.remove('visible');
-            document.getElementById('overlay').classList.remove('visible');
-        });
-        document.getElementById('overlay').addEventListener('click', () => {
-            document.getElementById('created-popup').classList.remove('visible');
-            document.getElementById('overlay').classList.remove('visible');
+            document.getElementById('created-popup').classList.remove('active');
+            document.getElementById('overlay').classList.remove('active');
         });
 
         loadKeys();
     </script>
 </body>
+
 </html>
